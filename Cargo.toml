@@ -4,12 +4,15 @@ version = "0.1.0"
 authors = ["J/A <archer884@gmail.com>"]
 
 [dependencies]
+chrono = "0.2.0"
 clap = { version = "*", features = ["unstable", "suggestions", "color"] }
 clippy = "*"
-iron = "*"
-persistent = "*"
-router = "*"
-serde = "*"
-serde_json = "*"
-serde_macros = "*"
+iron = "0.3.0"
+mount = "0.1.0"
+persistent = "0.1.0"
+router = "0.1.0"
+rwt = "0.1.0"
+serde = "0.7.0"
+serde_json = "0.7.0"
+serde_macros = "0.7.0"
 stopwatch = "*"
