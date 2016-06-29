@@ -1,37 +1,43 @@
 use iron::middleware::BeforeMiddleware;
 use iron::prelude::*;
-use std::error::Error;
-use std::fmt;
 
-#[derive(Debug)]
-pub enum AuthError {
-    IHateYou
+mod claims;
+mod error;
+mod user;
+
+pub use auth::claims::{Claims, Token};
+pub use auth::error::AuthError;
+pub use auth::user::{authorize, AuthResult};
+
+pub struct Authentication {
+    secret: Vec<u8>
 }
 
-impl fmt::Display for AuthError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str("I hate you")
+impl Authentication {
+    pub fn new<T: AsRef<[u8]>>(secret: T) -> Authentication {
+        Authentication {
+            secret: Vec::from(secret.as_ref())
+        }
     }
 }
-
-impl Error for AuthError {
-    fn description(&self) -> &str {
-        "I hate you"
-    }
-}
-
-pub struct Authentication;
 
 impl BeforeMiddleware for Authentication {
     fn before(&self, request: &mut Request) -> IronResult<()> {
         use iron::headers::{Authorization, Bearer};
-        
-        if let Some(ref bearer) = request.headers.get::<Authorization<Bearer>>() {
-            println!("Request authenticated with token: {}", bearer.token);
-            Ok(())
-        } else {
-            println!("Request denied");
-            Err(IronError::new(AuthError::IHateYou, "Fuck you"))
+
+        match request.headers.get::<Authorization<Bearer>>().and_then(|header| header.token.parse::<Token>().ok()) {
+            None => Err(IronError::new(AuthError::Unauthorized, "Unauthorized")),
+            Some(ref token) => {
+                if !token.is_valid(&self.secret) {
+                    return Err(IronError::new(AuthError::Unauthorized, "Unauthorized"));
+                }
+
+                if !token.payload.is_valid() {
+                    return Err(IronError::new(AuthError::Expired(token.payload.exp), "Token expired"));
+                }
+
+                Ok(())
+            }
         }
     }
 }
