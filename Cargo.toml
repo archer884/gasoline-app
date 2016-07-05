@@ -7,6 +7,7 @@ authors = ["J/A <archer884@gmail.com>"]
 chrono = "0.2.0"
 clap = { version = "*", features = ["unstable", "suggestions", "color"] }
 clippy = "*"
+gasoline-data = {git = "https://github.com/archer884/gasoline-data.git"}
 iron = "0.3.0"
 mount = "0.1.0"
 persistent = "0.1.0"

@@ -4,6 +4,7 @@
 #[macro_use] extern crate clap;
 #[macro_use] extern crate router;
 extern crate chrono;
+extern crate gasoline_data as data;
 extern crate iron;
 extern crate mount;
 extern crate persistent;
