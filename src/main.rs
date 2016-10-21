@@ -1,8 +1,12 @@
-#![feature(box_syntax, custom_derive, plugin, question_mark)]
-#![plugin(clippy, serde_macros)]
+#![cfg_attr(feature="clippy", feature(plugin))]
+#![cfg_attr(feature="clippy", plugin(clippy))]
+
+#![feature(box_syntax, custom_derive, plugin, proc_macro, question_mark)]
 
 #[macro_use] extern crate clap;
 #[macro_use] extern crate router;
+#[macro_use] extern crate serde_derive;
+
 extern crate chrono;
 extern crate gasoline_data as data;
 extern crate iron;
@@ -38,15 +42,15 @@ fn routes() -> Mount {
 
 fn public_routes() -> Router {
     router! {
-        get "/" => handler::welcome,
-        post "/auth" => handler::authorize,
+        root: get "/" => handler::welcome,
+        auth: post "/auth" => handler::authorize,
     }
 }
 
 fn authenticated_routes() -> Chain {
     let mut router = Chain::new(router! {
-        get "/" => handler::welcome,
-        get "/test" => handler::test,
+        root: get "/" => handler::welcome,
+        test: get "/test" => handler::test,
     });
     router.link_before(auth::Authentication::new(SECRET));
     router

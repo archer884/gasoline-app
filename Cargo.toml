@@ -1,19 +1,22 @@
 [package]
-name = "gasoline-app"
+name = "gasoline-core"
 version = "0.1.0"
 authors = ["J/A <archer884@gmail.com>"]
 
 [dependencies]
-chrono = "0.2.0"
-clap = { version = "*", features = ["unstable", "suggestions", "color"] }
-clippy = "*"
+chrono = "*"
+clap = {version = "*", features = ["unstable", "suggestions", "color"]}
+clippy = {version = "*", optional = true}
 gasoline-data = {git = "https://github.com/archer884/gasoline-data.git"}
-iron = "0.3.0"
-mount = "0.1.0"
-persistent = "0.1.0"
-router = "0.1.0"
-rwt = "0.1.0"
-serde = "0.7.0"
-serde_json = "0.7.0"
-serde_macros = "0.7.0"
+iron = "*"
+mount = "*"
+persistent = "*"
+router = "*"
+rwt = "*"
+serde = "*"
+serde_json = "*"
+serde_derive = "*"
 stopwatch = "*"
+
+[features]
+default = []
