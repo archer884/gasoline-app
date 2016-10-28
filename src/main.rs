@@ -1,7 +1,7 @@
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
-#![feature(box_syntax, custom_derive, plugin, proc_macro, question_mark)]
+#![feature(box_syntax, custom_derive, plugin, proc_macro)]
 
 #[macro_use] extern crate clap;
 #[macro_use] extern crate router;
