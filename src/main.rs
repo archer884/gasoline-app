@@ -29,8 +29,10 @@ use router::Router;
 const SECRET: &'static str = "this is a lame-ass secret";
 
 fn main() {
-    println!("Serving requests!");
-    Iron::new(routes()).http("localhost:1337").unwrap();
+    let address = "localhost:1337";
+    
+    println!("Serving on: {}", address);
+    Iron::new(routes()).http(address).unwrap();
 }
 
 fn routes() -> Mount {
