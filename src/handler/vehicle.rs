@@ -20,7 +20,10 @@ pub fn get(request: &mut Request) -> IronResult<Response> {
     let user = service.users().by_username(user_token.user()).expect("User not found");
     let vehicle = service.vehicles().by_id(vehicle_id).expect("Vehicle not found");
 
-    assert_eq!(user.id, vehicle.user_id);
+    if user.id != vehicle.user_id {
+        return Ok(Response::with((status::Unauthorized, "This doesn't belong to you!")));
+    }
+
     Ok(Response::with((status::Ok, format!("{:?}", vehicle))))
 }
 
@@ -28,15 +31,14 @@ pub fn get_page(request: &mut Request) -> IronResult<Response> {
     let mutex = request.get::<super::Db>().expect("unable to find db");
     let mut service = mutex.lock().expect("unable to lock db");
 
-    let page = match request.page() {
-        None => return Ok(Response::with((status::BadRequest, "Invalid page"))),
-        Some(page) => page,
-    };
-
+    let page = request.page().map(|n| Page::new(n)).unwrap_or_else(|| Page::new(1));
     let user_token = request.extensions.get::<Token>().expect("User token not found for authenticated request");
     let user = service.users().by_username(user_token.user()).expect("User not found");
 
-    let vehicles = service.vehicles().by_user(user.id, &Page::new(page));
+    println!("Requesting vehicles for user id: {}", user.id);
+
+    let vehicles = service.vehicles().by_user(user.id, &page);
+
     Ok(Response::with((status::Ok, format!("{:?}", vehicles))))
 }
 

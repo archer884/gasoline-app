@@ -64,10 +64,10 @@ fn authenticated_routes() -> Chain {
     use persistent::Write;
 
     let mut router = Chain::new(router! {
-        vehicle: get "/vehicle/:id" => handler::vehicle::get,
-        vehicle: get "/vehicles" => handler::vehicle::get_page,
-        vehicle: get "/vehicles/:page" => handler::vehicle::get_page,
+        vehicle_id: get "/vehicle/:id" => handler::vehicle::get,
+        vehicle_page: get "/vehicles/:page" => handler::vehicle::get_page,
     });
+
     router.link_before(auth::Authentication::new(SECRET));
     router.link(Write::<ConnectionService>::both(ConnectionService::new()));
     router
