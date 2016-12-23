@@ -54,6 +54,11 @@ impl Deserialize for Claims {
     fn deserialize<D: Deserializer>(deserializer: &mut D) -> Result<Self, D::Error> {
         use serde::de::Error;
 
+        fn from_timestamp(expiration: i64) -> Option<DateTime<UTC>> {
+            NaiveDateTime::from_num_seconds_from_unix_epoch_opt(expiration, 0)
+                .map(|datetime| UTC.from_utc_datetime(&datetime))
+        }
+
         #[derive(Deserialize)]
         struct Template {
             exp: i64,
@@ -69,8 +74,4 @@ impl Deserialize for Claims {
             },
         })
     }
-}
-
-fn from_timestamp(expiration: i64) -> Option<DateTime<UTC>> {
-    NaiveDateTime::from_num_seconds_from_unix_epoch_opt(expiration, 0).map(|datetime| UTC.from_utc_datetime(&datetime))
 }
