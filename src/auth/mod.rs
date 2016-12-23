@@ -27,14 +27,16 @@ impl BeforeMiddleware for Authentication {
 
         match request.headers.get::<Authorization<Bearer>>().and_then(|header| header.token.parse::<Token>().ok()) {
             None => Err(IronError::new(AuthError::Unauthorized, "Unauthorized")),
-            Some(ref token) => {
+            Some(token) => {
                 if !token.is_valid(&self.secret) {
                     return Err(IronError::new(AuthError::Unauthorized, "Unauthorized"));
                 }
 
-                if !token.payload.is_valid() {
-                    return Err(IronError::new(AuthError::Expired(token.payload.exp), "Token expired"));
+                if !token.payload().is_valid() {
+                    return Err(IronError::new(AuthError::Expired(token.payload().exp), "Token expired"));
                 }
+
+                request.extensions.insert::<Token>(token);
 
                 Ok(())
             }

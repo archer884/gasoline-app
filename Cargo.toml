@@ -8,14 +8,16 @@ chrono = "*"
 clap = {version = "*", features = ["unstable", "suggestions", "color"]}
 clippy = {version = "*", optional = true}
 gasoline-data = {git = "https://github.com/archer884/gasoline-data.git"}
+harsh = "*"
 iron = "*"
+lazy_static = "*"
 mount = "*"
 persistent = "*"
 router = "*"
 rwt = "*"
 serde = "*"
-serde_json = "*"
 serde_derive = "*"
+serde_json = "*"
 stopwatch = "*"
 
 [features]

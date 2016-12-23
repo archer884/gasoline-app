@@ -15,5 +15,5 @@ pub fn authorize(username: &str, password: &str) -> AuthResult {
         return Err(AuthError::Unauthorized)
     }
 
-    Ok(Rwt::with_payload(Claims::new(username), SECRET)?)
+    Ok(Token(Rwt::with_payload(Claims::new(username), SECRET)?))
 }

@@ -1,13 +1,19 @@
+pub mod vehicle;
+
 use auth;
-use iron;
+use data;
 use iron::prelude::*;
+use iron;
+use persistent;
 use request::Model;
+
+pub type Db = persistent::Write<data::ConnectionService>;
 
 pub fn authorize(request: &mut Request) -> IronResult<Response> {
     use model::AuthRequest;
     let request: AuthRequest = request.body.model()?;
 
-    match auth::authorize(&request.user, &request.password).map(|token| token.encode()) {
+    match auth::authorize(&request.user, &request.password).map(|token| token.inner().encode()) {
         Err(e) => Err(IronError::new(e, "Unauthorized")),
         Ok(Err(e)) => Err(IronError::new(e, "Unencodable token")),
         Ok(Ok(token)) => Ok(Response::with((iron::status::Ok, token))),

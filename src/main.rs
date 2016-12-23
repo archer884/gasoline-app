@@ -4,11 +4,13 @@
 #![feature(box_syntax, custom_derive, plugin, proc_macro)]
 
 #[macro_use] extern crate clap;
+#[macro_use] extern crate lazy_static;
 #[macro_use] extern crate router;
 #[macro_use] extern crate serde_derive;
 
 extern crate chrono;
 extern crate gasoline_data as data;
+extern crate harsh;
 extern crate iron;
 extern crate mount;
 extern crate persistent;
@@ -27,6 +29,14 @@ use mount::Mount;
 use router::Router;
 
 const SECRET: &'static str = "this is a lame-ass secret";
+
+lazy_static! {
+    static ref HARSH: harsh::Harsh = harsh::HarshBuilder::new()
+        .length(8)
+        .salt("this is a terrible salt")
+        .init()
+        .expect("invalid harsh");
+}
 
 fn main() {
     let address = "localhost:1337";
@@ -50,10 +60,15 @@ fn public_routes() -> Router {
 }
 
 fn authenticated_routes() -> Chain {
+    use data::ConnectionService;
+    use persistent::Write;
+
     let mut router = Chain::new(router! {
-        root: get "/" => handler::welcome,
-        test: get "/test" => handler::test,
+        vehicle: get "/vehicle/:id" => handler::vehicle::get,
+        vehicle: get "/vehicles" => handler::vehicle::get_page,
+        vehicle: get "/vehicles/:page" => handler::vehicle::get_page,
     });
     router.link_before(auth::Authentication::new(SECRET));
+    router.link(Write::<ConnectionService>::both(ConnectionService::new()));
     router
 }
