@@ -1,15 +1,10 @@
 use chrono::duration::Duration;
 use chrono::{DateTime, NaiveDateTime, TimeZone, UTC};
-use iron::typemap;
 use rwt::Rwt;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::str;
 
 pub struct Token(pub Rwt<Claims>);
-
-impl typemap::Key for Token {
-    type Value = Token;
-}
 
 impl Token {
     pub fn is_valid(&self, secret: &[u8]) -> bool {

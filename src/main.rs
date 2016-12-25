@@ -1,72 +1,59 @@
 #![cfg_attr(feature="clippy", feature(plugin))]
 #![cfg_attr(feature="clippy", plugin(clippy))]
 
-#![feature(box_syntax, custom_derive, plugin, proc_macro)]
+#![feature(box_syntax, custom_derive, plugin, proc_macro, slice_patterns)]
+#![plugin(rocket_codegen)]
 
 #[macro_use] extern crate clap;
 #[macro_use] extern crate lazy_static;
-#[macro_use] extern crate router;
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate rocket_codegen;
 
 extern crate chrono;
-extern crate gasoline_data as data;
+extern crate gasoline_data;
 extern crate harsh;
-extern crate iron;
-extern crate mount;
-extern crate persistent;
 extern crate rwt;
 extern crate serde;
 extern crate serde_json;
 extern crate stopwatch;
+extern crate rocket;
 
+mod api;
 mod auth;
 mod handler;
 mod model;
-mod request;
-
-use iron::prelude::*;
-use mount::Mount;
-use router::Router;
 
 const SECRET: &'static str = "this is a lame-ass secret";
 
-lazy_static! {
-    static ref HARSH: harsh::Harsh = harsh::HarshBuilder::new()
-        .length(8)
-        .salt("this is a terrible salt")
-        .init()
-        .expect("invalid harsh");
-
-    static ref DB: data::ConnectionService = data::ConnectionService::new();
-}
-
 fn main() {
-    let address = "localhost:1337";
-    
-    println!("Serving on: {}", address);
-    Iron::new(routes()).http(address).unwrap();
+    rocket::ignite()
+        .mount("/api/vehicles", routes![
+            handler::vehicle::get
+        ])
+        .launch();
 }
 
-fn routes() -> Mount {
-    let mut routes = Mount::new();
-    routes.mount("/", public_routes());
-    routes.mount("/api", authenticated_routes());
-    routes
-}
+mod service {
+    use gasoline_data::ConnectionService;
+    use harsh::{Harsh, HarshBuilder};
 
-fn public_routes() -> Router {
-    router! {
-        root: get "/" => handler::welcome,
-        auth: post "/auth" => handler::authorize,
+    lazy_static! {
+        static ref HARSH: Harsh = HarshBuilder::new()
+            .length(8)
+            .salt("this is a terrible salt")
+            .init()
+            .expect("invalid harsh");
+
+        static ref DB: ConnectionService = ConnectionService::new();
     }
-}
 
-fn authenticated_routes() -> Chain {
-    let mut router = Chain::new(router! {
-        vehicle_id: get "/vehicle/:id" => handler::vehicle::get,
-        vehicle_page: get "/vehicles/:page" => handler::vehicle::get_page,
-    });
+    pub use gasoline_data::Page;
 
-    router.link_before(auth::Authentication::new(SECRET));
-    router
+    pub fn db() -> &'static ConnectionService {
+        &DB
+    }
+
+    pub fn harsh() -> &'static Harsh {
+        &HARSH
+    }
 }
