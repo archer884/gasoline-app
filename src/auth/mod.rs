@@ -1,6 +1,3 @@
-use iron::middleware::BeforeMiddleware;
-use iron::prelude::*;
-
 mod claims;
 mod error;
 mod user;
@@ -21,25 +18,25 @@ impl Authentication {
     }
 }
 
-impl BeforeMiddleware for Authentication {
-    fn before(&self, request: &mut Request) -> IronResult<()> {
-        use iron::headers::{Authorization, Bearer};
+// impl BeforeMiddleware for Authentication {
+//     fn before(&self, request: &mut Request) -> IronResult<()> {
+//         use iron::headers::{Authorization, Bearer};
 
-        match request.headers.get::<Authorization<Bearer>>().and_then(|header| header.token.parse::<Token>().ok()) {
-            None => Err(IronError::new(AuthError::Unauthorized, "Unauthorized")),
-            Some(token) => {
-                if !token.is_valid(&self.secret) {
-                    return Err(IronError::new(AuthError::Unauthorized, "Unauthorized"));
-                }
+//         match request.headers.get::<Authorization<Bearer>>().and_then(|header| header.token.parse::<Token>().ok()) {
+//             None => Err(IronError::new(AuthError::Unauthorized, "Unauthorized")),
+//             Some(token) => {
+//                 if !token.is_valid(&self.secret) {
+//                     return Err(IronError::new(AuthError::Unauthorized, "Unauthorized"));
+//                 }
 
-                if !token.payload().is_valid() {
-                    return Err(IronError::new(AuthError::Expired(token.payload().exp), "Token expired"));
-                }
+//                 if !token.payload().is_valid() {
+//                     return Err(IronError::new(AuthError::Expired(token.payload().exp), "Token expired"));
+//                 }
 
-                request.extensions.insert::<Token>(token);
+//                 request.extensions.insert::<Token>(token);
 
-                Ok(())
-            }
-        }
-    }
-}
+//                 Ok(())
+//             }
+//         }
+//     }
+// }
