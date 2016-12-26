@@ -4,6 +4,7 @@ use rwt::Rwt;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::str;
 
+#[derive(Debug)]
 pub struct Token(pub Rwt<Claims>);
 
 impl Token {
@@ -32,6 +33,7 @@ impl str::FromStr for Token {
     }
 }
 
+#[derive(Debug)]
 pub struct Claims {
     pub exp: DateTime<UTC>,
     pub usr: String,

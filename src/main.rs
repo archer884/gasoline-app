@@ -23,10 +23,11 @@ mod auth;
 mod handler;
 mod model;
 
-const SECRET: &'static str = "this is a lame-ass secret";
-
 fn main() {
     rocket::ignite()
+        .mount("/auth", routes![
+            handler::authorize
+        ])
         .mount("/api/vehicles", routes![
             handler::vehicle::get
         ])
@@ -36,6 +37,8 @@ fn main() {
 mod service {
     use gasoline_data::ConnectionService;
     use harsh::{Harsh, HarshBuilder};
+
+    static SECRET: &'static str = "this is a lame-ass secret";
 
     lazy_static! {
         static ref HARSH: Harsh = HarshBuilder::new()
@@ -47,13 +50,15 @@ mod service {
         static ref DB: ConnectionService = ConnectionService::new();
     }
 
-    pub use gasoline_data::Page;
-
     pub fn db() -> &'static ConnectionService {
         &DB
     }
 
     pub fn harsh() -> &'static Harsh {
         &HARSH
+    }
+
+    pub fn secret() -> &'static str {
+        SECRET
     }
 }

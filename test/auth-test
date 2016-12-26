@@ -1,0 +1,2 @@
+#!/bin/zsh
+curl -H 'Authorization: Bearer '`curl --data @authrequest.json localhost:1337/auth` -I localhost:1337/api/vehicles/y0jZaJdL

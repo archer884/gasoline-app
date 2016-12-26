@@ -1,11 +1,7 @@
 use rwt::Rwt;
-use super::super::SECRET;
+use service;
 
-use auth::{
-    AuthError,
-    Claims,
-    Token
-};
+use auth::{AuthError, Claims, Token};
 
 pub type AuthResult = Result<Token, AuthError>;
 
@@ -15,5 +11,5 @@ pub fn authorize(username: &str, password: &str) -> AuthResult {
         return Err(AuthError::Unauthorized)
     }
 
-    Ok(Token(Rwt::with_payload(Claims::new(username), SECRET)?))
+    Ok(Token(Rwt::with_payload(Claims::new(username), service::secret())?))
 }
