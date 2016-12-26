@@ -14,14 +14,9 @@ pub fn get(id: Identifier, user_context: UserContext) -> Result<VehicleResponse>
     }
 }
 
-// pub fn get_page(request: &mut Request) -> IronResult<Response> {
-//     let page = request.page().map(|n| Page::new(n)).unwrap_or_else(|| Page::new(1));
-//     let user_token = request.extensions.get::<Token>().expect("User token not found for authenticated request");
-//     let user = DB.users().by_username(user_token.user()).expect("User not found");
-
-//     println!("Requesting vehicles for user id: {}", user.id);
-
-//     let vehicles = DB.vehicles().by_user(user.id, &page);
-
-//     Ok(Response::with((status::Ok, format!("{:?}", vehicles))))
-// }
+#[get("/")]
+pub fn get_page(page: Page, user_context: UserContext) -> Result<Collection<VehicleResponse>> {
+    Ok(Collection::new(service::db().vehicles().by_user(user_context.id(), &page)
+        .map_err(|_| Error::not_found())?.into_iter().map(VehicleResponse::from).collect()
+    ))
+}

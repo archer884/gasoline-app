@@ -1,0 +1,5 @@
+#!/bin/zsh
+header='Authorization: Bearer '`curl --data @authrequest.json localhost:1337/auth`
+curl -H $header 'localhost:1337/api/vehicles/y0jZaJdL'
+curl -H $header 'localhost:1337/api/vehicles'
+curl -H $header 'localhost:1337/api/vehicles?page=20'

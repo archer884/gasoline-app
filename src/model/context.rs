@@ -1,4 +1,4 @@
-use api;
+use api::*;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
 use service;
@@ -14,27 +14,50 @@ impl UserContext {
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for UserContext {
-    type Error = api::Error;
+    type Error = Error;
 
     fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
         use auth::Token;
-        
-        println!("Building user context from request");
+
         let token = request.headers()
             .get("Authorization")
-            .inspect(|value| println!("{}", value))
             .nth(0)
             .map(|s| s[7..].parse::<Token>());
 
-        println!("{:?}", token);
-
         match token {
             Some(Ok(token)) => {
-                println!("hit unimplemented authorization path");
-                unimplemented!()
+                if !token.is_valid(service::secret()) {
+                    return ::rocket::outcome::Outcome::Failure((
+                        Status::Unauthorized,
+                        Error::unauthorized(),
+                    ));
+                }
+
+                if !token.payload().is_valid() {
+                    return ::rocket::outcome::Outcome::Failure((
+                        Status::Unauthorized,
+                        Error::new(ErrorKind::Unauthorized, "Token expired."),
+                    ));
+                }
+
+                let user = match service::db().users().by_username(token.user()) {
+                    Ok(user) => user,
+                    Err(_) => return ::rocket::outcome::Outcome::Failure((
+                        Status::Unauthorized,
+
+                        // No. You see, that user totally exists. You heard it hit the hull.
+                        // And I... I was never here.
+                        Error::new(ErrorKind::Unauthorized, "Token expired."),
+                    )),
+                };
+
+                ::rocket::outcome::Outcome::Success(UserContext {
+                    id: user.id,
+                    username: token.user().into(),
+                })
             },
-            
-            _ => ::rocket::outcome::Outcome::Failure((Status::Unauthorized, api::Error::unauthorized()))
+
+            _ => ::rocket::outcome::Outcome::Failure((Status::Unauthorized, Error::unauthorized()))
         }
     }
 }

@@ -5,6 +5,12 @@ use std::error;
 use std::fmt;
 use std::ops::Deref;
 
+mod collection;
+mod page;
+
+pub use api::collection::Collection;
+pub use api::page::Page;
+
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 #[derive(Debug)]
@@ -81,50 +87,5 @@ impl<'a> FromParam<'a> for Identifier {
                 message: format!("`{}` does not map to a valid identifier", param),
             })
         }
-    }
-}
-
-pub struct Page {
-    idx: i64,
-    size: i64,
-}
-
-impl Page {
-    pub fn new(idx: i64) -> Page {
-        Page::with_size(idx, 10)
-    }
-
-    pub fn with_size(idx: i64, size: i64) -> Page {
-        Page {
-            idx: idx,
-            size: size,
-        }
-    }
-}
-
-impl Paging for Page {
-    fn offset(&self) -> i64 { self.idx * self.size }
-    fn limit(&self) -> i64 { self.size }
-}
-
-#[cfg(test)]
-mod tests {
-    use api::Page;
-    use service::Paging;
-    
-    #[test]
-    fn page_0_10() {
-        let page = Page::new(0);
-        
-        assert_eq!(0, page.offset());
-        assert_eq!(10, page.limit());
-    }
-
-    #[test]
-    fn page_90_100() {
-        let page = Page::new(9);
-
-        assert_eq!(90, page.offset());
-        assert_eq!(100, page.offset());
     }
 }
