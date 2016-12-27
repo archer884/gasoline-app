@@ -1,22 +1,39 @@
-use rwt::Rwt;
-
 use chrono::duration::Duration;
-use chrono::{
-    DateTime,
-    NaiveDateTime,
-    TimeZone,
-    UTC,
-};
+use chrono::{DateTime, NaiveDateTime, TimeZone, UTC};
+use rwt::Rwt;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::str;
 
-use serde::{
-    Deserialize,
-    Deserializer,
-    Serialize,
-    Serializer
-};
+#[derive(Debug)]
+pub struct Token(pub Rwt<Claims>);
 
-pub type Token = Rwt<Claims>;
+impl Token {
+    pub fn is_valid(&self, secret: &[u8]) -> bool {
+        self.0.is_valid(secret)
+    }
 
+    pub fn inner(&self) -> &Rwt<Claims> {
+        &self.0
+    }
+
+    pub fn payload(&self) -> &Claims {
+        &self.0.payload
+    }
+
+    pub fn user(&self) -> &str {
+        &self.0.payload.usr
+    }
+}
+
+impl str::FromStr for Token {
+    type Err = <Rwt<Claims> as str::FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Token(s.parse::<Rwt<Claims>>()?))
+    }
+}
+
+#[derive(Debug)]
 pub struct Claims {
     pub exp: DateTime<UTC>,
     pub usr: String,

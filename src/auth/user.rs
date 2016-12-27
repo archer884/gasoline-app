@@ -1,19 +1,15 @@
 use rwt::Rwt;
-use super::super::SECRET;
+use service;
 
-use auth::{
-    AuthError,
-    Claims,
-    Token
-};
+use auth::{AuthError, Claims, Token};
 
 pub type AuthResult = Result<Token, AuthError>;
 
 pub fn authorize(username: &str, password: &str) -> AuthResult {
     // most secure password logic in history
-    if !username.contains("archer") || password != "password" {
+    if !username.contains("archer884") || password != "password" {
         return Err(AuthError::Unauthorized)
     }
 
-    Ok(Rwt::with_payload(Claims::new(username), SECRET)?)
+    Ok(Token(Rwt::with_payload(Claims::new(username), service::secret())?))
 }
