@@ -146,7 +146,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "gasoline-data"
 version = "0.1.0"
-source = "git+https://github.com/archer884/gasoline-data.git#211a2dbf1914871b4b7632c21b1a59b55951878f"
+source = "git+https://github.com/archer884/gasoline-data.git#c7dff21512c9a7189b309be04bcc0c9fd7aaa8a7"
 dependencies = [
  "diesel 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "diesel_codegen 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
