@@ -72,10 +72,12 @@ impl Deref for Identifier {
     }
 }
 
+use rocket::http::RawStr;
+
 impl<'a> FromParam<'a> for Identifier {
     type Error = Error;
 
-    fn from_param(param: &'a str) -> Result<Self> {
+    fn from_param(param: &'a RawStr) -> Result<Self> {
         match service::harsh().decode(param) {
             Some(ref mut x) if !x.is_empty() => {
                 let id = x.pop().unwrap();

@@ -11,5 +11,6 @@ pub fn authorize(username: &str, password: &str) -> AuthResult {
         return Err(AuthError::Unauthorized)
     }
 
-    Ok(Token(Rwt::with_payload(Claims::new(username), service::secret())?))
+    // FIXME: this code pretends you are user 1 no matter what
+    Ok(Token(Rwt::with_payload(Claims::new(1, username), service::secret())?))
 }

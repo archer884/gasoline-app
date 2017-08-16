@@ -1,13 +1,8 @@
-#![cfg_attr(feature="clippy", feature(plugin))]
-#![cfg_attr(feature="clippy", plugin(clippy))]
-
 #![feature(box_syntax, custom_derive, plugin, proc_macro, slice_patterns)]
 #![plugin(rocket_codegen)]
 
-#[macro_use] extern crate clap;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
-#[macro_use] extern crate rocket_codegen;
 
 extern crate chrono;
 extern crate gasoline_data;
@@ -17,6 +12,7 @@ extern crate serde;
 extern crate serde_json;
 extern crate stopwatch;
 extern crate rocket;
+extern crate rocket_contrib;
 
 mod api;
 mod auth;

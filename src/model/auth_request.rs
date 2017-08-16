@@ -12,7 +12,7 @@ pub struct AuthRequest {
 impl data::FromData for AuthRequest {
     type Error = Error;
 
-    fn from_data(request: &rocket::Request, data: rocket::Data) -> data::Outcome<Self, Self::Error> {
+    fn from_data(_request: &rocket::Request, data: rocket::Data) -> data::Outcome<Self, Self::Error> {
         use std::io::Read;
         
         let mut buf = String::new();

@@ -1,10 +1,10 @@
-use chrono::duration::Duration;
-use chrono::{DateTime, NaiveDateTime, TimeZone, UTC};
+use chrono::Duration;
+use chrono::prelude::*;
 use rwt::Rwt;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::str;
+use service;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Token(pub Rwt<Claims>);
 
 impl Token {
@@ -25,70 +25,66 @@ impl Token {
     }
 }
 
-impl str::FromStr for Token {
-    type Err = <Rwt<Claims> as str::FromStr>::Err;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Token(s.parse::<Rwt<Claims>>()?))
-    }
-}
-
 #[derive(Debug)]
 pub struct Claims {
-    pub exp: DateTime<UTC>,
+    pub exp: DateTime<Utc>,
+    pub uid: i64,
     pub usr: String,
 }
 
 impl Claims {
-    pub fn new<T: Into<String>>(usr: T) -> Claims {
+    pub fn new<T: Into<String>>(uid: i64, usr: T) -> Claims {
         Claims {
+            exp: Utc::now() + Duration::days(7),
+            uid,
             usr: usr.into(),
-            exp: UTC::now() + Duration::days(7)
         }
     }
 
     pub fn is_valid(&self) -> bool {
-        UTC::now() < self.exp
+        Utc::now() < self.exp
     }
 }
 
 impl Serialize for Claims {
-    fn serialize<S: Serializer>(&self, serializer: &mut S) -> Result<(), S::Error> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         #[derive(Serialize)]
         struct Template<'a> {
             exp: i64,
+            uid: String,
             usr: &'a str,
         }
 
-        Template {
-            exp: self.exp.num_seconds_from_unix_epoch(),
+        let template = Template {
+            exp: self.exp.timestamp(),
+            uid: service::harsh().encode(&[self.uid as u64]).unwrap(),
             usr: &self.usr,
-        }.serialize(serializer)
+        };
+
+        template.serialize(serializer)
     }
 }
 
-impl Deserialize for Claims {
-    fn deserialize<D: Deserializer>(deserializer: &mut D) -> Result<Self, D::Error> {
+impl<'a> Deserialize<'a> for Claims {
+    fn deserialize<D: Deserializer<'a>>(deserializer: D) -> Result<Self, D::Error> {
         use serde::de::Error;
 
-        fn from_timestamp(expiration: i64) -> Option<DateTime<UTC>> {
-            NaiveDateTime::from_num_seconds_from_unix_epoch_opt(expiration, 0)
-                .map(|datetime| UTC.from_utc_datetime(&datetime))
+        fn from_timestamp(expiration: i64) -> Option<DateTime<Utc>> {
+            NaiveDateTime::from_timestamp_opt(expiration, 0)
+                .map(|datetime| Utc.from_utc_datetime(&datetime))
         }
 
         #[derive(Deserialize)]
         struct Template {
             exp: i64,
+            uid: String,
             usr: String,
         }
 
-        let template = Template::deserialize(deserializer)?;
-        Ok(Claims {
-            usr: template.usr,
-            exp: match from_timestamp(template.exp) {
-                None => return Err(Error::custom("Invalid datetime")),
-                Some(datetime) => datetime,
-            },
-        })
+        let Template { exp, uid, usr } = Template::deserialize(deserializer)?;
+        let exp = from_timestamp(exp).ok_or_else(|| Error::custom("Invalid timestamp"))?;
+        let uid = *service::harsh().decode(&uid).unwrap().first().ok_or_else(|| Error::custom("Invalid user id"))? as i64;
+
+        Ok(Claims { exp, uid, usr })
     }
 }
