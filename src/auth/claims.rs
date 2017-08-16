@@ -1,8 +1,9 @@
 use chrono::Duration;
 use chrono::prelude::*;
-use rwt::Rwt;
+use rwt::{Rwt, RwtError};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use service;
+use std::str::FromStr;
 
 #[derive(Debug, Deserialize)]
 pub struct Token(pub Rwt<Claims>);
@@ -25,6 +26,14 @@ impl Token {
     }
 }
 
+impl FromStr for Token {
+    type Err = RwtError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Token(s.parse::<Rwt<Claims>>()?))
+    }
+}
+
 #[derive(Debug)]
 pub struct Claims {
     pub exp: DateTime<Utc>,
@@ -43,6 +52,15 @@ impl Claims {
 
     pub fn is_valid(&self) -> bool {
         Utc::now() < self.exp
+    }
+}
+
+impl FromStr for Claims {
+    type Err = RwtError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use serde_json;
+        Ok(serde_json::from_str(s).map_err(RwtError::Json)?)
     }
 }
 
