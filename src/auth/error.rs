@@ -1,4 +1,4 @@
-use chrono::{DateTime, UTC};
+use chrono::{DateTime, Utc};
 use rwt::RwtError;
 use std::fmt;
 use std::error::Error;
@@ -6,7 +6,7 @@ use std::error::Error;
 #[derive(Debug)]
 pub enum AuthError {
     BadToken(RwtError),
-    Expired(DateTime<UTC>),
+    Expired(DateTime<Utc>),
     Unauthorized,
 }
 

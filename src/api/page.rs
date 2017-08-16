@@ -1,6 +1,5 @@
 use api::*;
 use rocket::request::{FromRequest, Outcome, Request};
-use rocket::http::Status;
 
 #[derive(Debug)]
 pub struct Page {

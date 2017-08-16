@@ -1,5 +1,4 @@
 use gasoline_data::Vehicle;
-use rocket::response::{self, Responder, Response};
 use service;
 
 #[derive(Serialize)]
@@ -20,18 +19,5 @@ impl From<Vehicle> for VehicleResponse {
             description: vehicle.description,
             image: vehicle.image,
         }
-    }
-}
-
-impl<'r> Responder<'r> for VehicleResponse {
-    fn respond(self) -> response::Result<'r> {
-        use rocket::http::ContentType;
-        use serde_json::to_string as json;
-        use std::io::Cursor;
-
-        Response::build()
-            .sized_body(Cursor::new(json(&self).unwrap()))
-            .header(ContentType::new("application/json", "x-vehicle"))
-            .ok()
     }
 }
