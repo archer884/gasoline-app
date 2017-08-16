@@ -14,7 +14,7 @@ fn get(id: Identifier, user_context: UserContext) -> Result<Json<FillupModel>> {
     }
 }
 
-#[get("/page")]
+#[get("/")]
 pub fn get_page(page: Page, user_context: UserContext) -> Result<Json<Collection<FillupModel>>> {
     let fillups = service::db().fillups().by_user(user_context.id(), &page)
         .map_err(|_| Error::not_found())?

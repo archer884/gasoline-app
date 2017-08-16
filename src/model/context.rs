@@ -1,7 +1,6 @@
 use api::*;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::http::Status;
-use serde_json;
 use service;
 
 #[derive(Debug)]
@@ -20,14 +19,10 @@ impl<'a, 'r> FromRequest<'a, 'r> for UserContext {
     fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
         use auth::Token;
 
-        let token = match request.headers().get("Authorization").nth(0) {
-            Some(ref header) => {
-                let header = &header[7..];
-                Some(serde_json::from_str::<Token>(header))
-            }
-
-            None => None,
-        };
+        let token = request.headers()
+            .get("Authorization")
+            .nth(0)
+            .map(|s| s[7..].parse::<Token>());
 
         match token {
             Some(Ok(token)) => {
