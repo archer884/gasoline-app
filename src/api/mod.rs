@@ -48,6 +48,13 @@ impl Error {
             message: "Unauthorized".into(),
         }
     }
+
+    pub fn internal(e: &error::Error) -> Error {
+        Error {
+            kind: ErrorKind::InternalServerError,
+            message: e.description().into(),
+        }
+    }
 }
 
 impl fmt::Display for Error {

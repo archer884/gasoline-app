@@ -1,8 +1,8 @@
-use gasoline_data::Vehicle;
+use gasoline_data::{Vehicle, NewVehicle};
 use service;
 
 #[derive(Serialize)]
-pub struct VehicleResponse {
+pub struct VehicleModel {
     id: String,
     user_id: String,
     name: String,
@@ -10,14 +10,42 @@ pub struct VehicleResponse {
     image: Option<String>,
 }
 
-impl From<Vehicle> for VehicleResponse {
-    fn from(vehicle: Vehicle) -> VehicleResponse {
-        VehicleResponse {
-            id: service::harsh().encode(&[vehicle.id as u64]).unwrap(),
-            user_id: service::harsh().encode(&[vehicle.user_id as u64]).unwrap(),
-            name: vehicle.name,
-            description: vehicle.description,
-            image: vehicle.image,
+impl From<Vehicle> for VehicleModel {
+    fn from(model: Vehicle) -> Self {
+        VehicleModel {
+            id: service::harsh().encode(&[model.id as u64]).unwrap(),
+            user_id: service::harsh().encode(&[model.user_id as u64]).unwrap(),
+            name: model.name,
+            description: model.description,
+            image: model.image,
+        }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct CreateVehicleModel {
+    name: String,
+    description: Option<String>,
+    image: Option<String>,
+}
+
+impl CreateVehicleModel {
+    pub fn as_insert(&self, user_id: i64) -> NewVehicle {
+        let description = match self.description {
+            None => None,
+            Some(ref desc) => Some(desc.as_ref()),
+        };
+
+        let image = match self.image {
+            None => None,
+            Some(ref image) => Some(image.as_ref()),
+        };
+
+        NewVehicle {
+            user_id,
+            name: &self.name,
+            description,
+            image,
         }
     }
 }

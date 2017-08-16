@@ -1,3 +1,4 @@
+pub mod fillup;
 pub mod vehicle;
 
 use api::*;
