@@ -1,4 +1,4 @@
-#![feature(box_syntax, custom_derive, plugin, proc_macro, slice_patterns)]
+#![feature(plugin)]
 #![plugin(rocket_codegen)]
 
 #[macro_use] extern crate lazy_static;
@@ -27,6 +27,12 @@ fn main() {
         .mount("/api/vehicles", routes![
             handler::vehicle::get,
             handler::vehicle::get_page,
+            handler::vehicle::post,
+        ])
+        .mount("/api/fillups", routes![
+            handler::fillup::get,
+            handler::fillup::get_page,
+            handler::fillup::post,
         ])
         .launch();
 }
