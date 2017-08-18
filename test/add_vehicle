@@ -1,0 +1,3 @@
+#!/bin/zsh
+auth_header='Authorization: Bearer '`curl --data @authrequest.json localhost:1337/auth`
+curl -H $auth_header -H "Content-Type: application/json" -d @new_vehicle.json 'localhost:1337/api/vehicles'
