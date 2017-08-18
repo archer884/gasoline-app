@@ -16,6 +16,7 @@ extern crate rocket_contrib;
 
 mod api;
 mod auth;
+mod error;
 mod handler;
 mod model;
 
