@@ -24,6 +24,10 @@ impl Token {
     pub fn user(&self) -> &str {
         &self.0.payload.usr
     }
+
+    pub fn timestamp(&self) -> i64 {
+        self.0.payload.exp.timestamp()
+    }
 }
 
 impl FromStr for Token {
