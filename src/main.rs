@@ -24,6 +24,7 @@ fn main() {
     rocket::ignite()
         .mount("/auth", routes![
             handler::authorize,
+            handler::authorize_bare,
         ])
         .mount("/api/vehicles", routes![
             handler::vehicle::get,
