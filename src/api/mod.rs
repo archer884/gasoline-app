@@ -85,16 +85,11 @@ impl<'a> FromParam<'a> for Identifier {
     type Error = Error;
 
     fn from_param(param: &'a RawStr) -> Result<Self> {
-        match service::harsh().decode(param) {
-            Some(ref mut x) if !x.is_empty() => {
-                let id = x.pop().unwrap();
-                Ok(Identifier(id as i64))
-            },
-
-            _ => Err(Error {
+        service::harsh().decode_single(param)
+            .map(|id| Identifier(id as i64))
+            .map_err(|_| Error {
                 kind: ErrorKind::Invalid,
                 message: format!("`{}` does not map to a valid identifier", param),
             })
-        }
     }
 }

@@ -10,7 +10,7 @@ rocket_contrib = "*"
 chrono = "*"
 clap = { version = "*", features = ["unstable", "suggestions", "color"] }
 gasoline-data = { path = "../gasoline-data" }
-harsh = "*"
+harsh = { path = "../../harsh" }
 lazy_static = "*"
 rwt = "*"
 serde = "*"
