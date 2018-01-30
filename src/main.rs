@@ -8,6 +8,7 @@ extern crate chrono;
 extern crate crockford;
 extern crate gasoline_data;
 extern crate rocket_contrib;
+extern crate rocket_cors;
 extern crate rocket;
 extern crate rwt;
 extern crate serde_json;
@@ -21,6 +22,7 @@ mod handler;
 mod model;
 
 fn main() {
+    let cors_options = rocket_cors::Cors::default();
     rocket::ignite()
         .mount("/auth", routes![
             handler::authorize,
@@ -36,6 +38,7 @@ fn main() {
             handler::fillup::get_page,
             handler::fillup::post,
         ])
+        .attach(cors_options)
         .launch();
 }
 
