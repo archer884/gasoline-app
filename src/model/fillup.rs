@@ -13,9 +13,9 @@ pub struct FillupModel {
 impl From<Fillup> for FillupModel {
     fn from(model: Fillup) -> Self {
         FillupModel {
-            id: service::harsh().encode(&[model.id as u64]).unwrap(),
-            user_id: service::harsh().encode(&[model.user_id as u64]).unwrap(),
-            vehicle_id: service::harsh().encode(&[model.vehicle_id as u64]).unwrap(),
+            id: service::encode(model.id as u64),
+            user_id: service::encode(model.user_id as u64),
+            vehicle_id: service::encode(model.vehicle_id as u64),
             cost: model.cost,
             qty: model.qty,
         }
@@ -31,11 +31,7 @@ pub struct CreateFillupModel {
 
 impl CreateFillupModel {
     pub fn as_insert(&self, user_id: i64) -> NewFillup {
-        let vehicle_id = service::harsh().decode(&self.vehicle_id)
-            .unwrap()
-            .into_iter()
-            .next()
-            .unwrap() as i64;
+        let vehicle_id = service::decode(&self.vehicle_id).unwrap() as i64;
         
         NewFillup {
             user_id,

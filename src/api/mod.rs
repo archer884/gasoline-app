@@ -85,7 +85,7 @@ impl<'a> FromParam<'a> for Identifier {
     type Error = Error;
 
     fn from_param(param: &'a RawStr) -> Result<Self> {
-        service::harsh().decode_single(param)
+        service::decode(param)
             .map(|id| Identifier(id as i64))
             .map_err(|_| Error {
                 kind: ErrorKind::Invalid,

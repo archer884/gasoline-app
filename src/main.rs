@@ -5,14 +5,14 @@
 #[macro_use] extern crate serde_derive;
 
 extern crate chrono;
+extern crate crockford;
 extern crate gasoline_data;
-extern crate harsh;
-extern crate rwt;
-extern crate serde;
-extern crate serde_json;
-extern crate stopwatch;
-extern crate rocket;
 extern crate rocket_contrib;
+extern crate rocket;
+extern crate rwt;
+extern crate serde_json;
+extern crate serde;
+extern crate stopwatch;
 
 mod api;
 mod auth;
@@ -41,29 +41,26 @@ fn main() {
 
 mod service {
     use gasoline_data::ConnectionService;
-    use harsh::{Harsh, HarshBuilder};
-
-    static SECRET: &'static [u8] = b"this is a lame-ass secret";
+    use crockford::{self, Error};
 
     lazy_static! {
-        static ref HARSH: Harsh = HarshBuilder::new()
-            .length(8)
-            .salt("this is a terrible salt")
-            .init()
-            .expect("invalid harsh");
-
-        static ref DB: ConnectionService = ConnectionService::new();
+        static ref CONNECTION_SERVICE: ConnectionService = ConnectionService::new();
     }
 
     pub fn db() -> &'static ConnectionService {
-        &DB
+        &*CONNECTION_SERVICE
     }
 
-    pub fn harsh() -> &'static Harsh {
-        &HARSH
+    pub fn encode(n: u64) -> String {
+        crockford::encode(n)
     }
 
+    pub fn decode(s: &str) -> Result<u64, Error> {
+        crockford::decode(s)
+    }
+
+    /// Secret for use with RWT.
     pub fn secret() -> &'static [u8] {
-        SECRET
+        b"Super-duper-secret secret used for RWT signing."
     }
 }

@@ -79,7 +79,7 @@ impl Serialize for Claims {
 
         let template = Template {
             exp: self.exp.timestamp(),
-            uid: service::harsh().encode(&[self.uid as u64]).unwrap(),
+            uid: service::encode(self.uid as u64),
             usr: &self.usr,
         };
 
@@ -105,7 +105,7 @@ impl<'a> Deserialize<'a> for Claims {
 
         let Template { exp, uid, usr } = Template::deserialize(deserializer)?;
         let exp = from_timestamp(exp).ok_or_else(|| Error::custom("Invalid timestamp"))?;
-        let uid = *service::harsh().decode(&uid).unwrap().first().ok_or_else(|| Error::custom("Invalid user id"))? as i64;
+        let uid = service::decode(&uid).map_err(|_| Error::custom("Invalid user id"))? as i64;
 
         Ok(Claims { exp, uid, usr })
     }

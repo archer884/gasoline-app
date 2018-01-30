@@ -13,8 +13,8 @@ pub struct VehicleModel {
 impl From<Vehicle> for VehicleModel {
     fn from(model: Vehicle) -> Self {
         VehicleModel {
-            id: service::harsh().encode(&[model.id as u64]).unwrap(),
-            user_id: service::harsh().encode(&[model.user_id as u64]).unwrap(),
+            id: service::encode(model.id as u64),
+            user_id: service::encode(model.user_id as u64),
             name: model.name,
             description: model.description,
             image: model.image,

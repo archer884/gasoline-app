@@ -4,14 +4,14 @@ version = "0.1.0"
 authors = ["J/A <archer884@gmail.com>"]
 
 [dependencies]
+chrono = "*"
+clap = { version = "*", features = ["unstable", "suggestions", "color"] }
+crockford = "*"
+gasoline-data = { path = "../gasoline-data" }
+lazy_static = "*"
 rocket = "*"
 rocket_codegen = "*"
 rocket_contrib = "*"
-chrono = "*"
-clap = { version = "*", features = ["unstable", "suggestions", "color"] }
-gasoline-data = { path = "../gasoline-data" }
-harsh = { path = "../../harsh" }
-lazy_static = "*"
 rwt = "*"
 serde = "*"
 serde_derive = "*"
