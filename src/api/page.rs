@@ -49,7 +49,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Page {
 #[cfg(test)]
 mod tests {
     use api::Page;
-    use service::Paging;
+    use gasoline_data::Paging;
     
     #[test]
     fn page_0_10() {
@@ -64,6 +64,6 @@ mod tests {
         let page = Page::new(9);
 
         assert_eq!(90, page.offset());
-        assert_eq!(100, page.offset());
+        assert_eq!(10, page.limit());
     }
 }
