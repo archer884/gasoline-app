@@ -4,6 +4,7 @@ use service;
 #[derive(Serialize)]
 pub struct VehicleModel {
     id: String,
+    #[serde(rename="userId")]
     user_id: String,
     name: String,
     description: Option<String>,
