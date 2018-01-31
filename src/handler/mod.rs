@@ -1,3 +1,5 @@
+#![allow(unknown_lints, needless_pass_by_value)]
+
 pub mod fillup;
 pub mod vehicle;
 
@@ -11,7 +13,7 @@ pub fn authorize(request: AuthRequest) -> Result<Json<TokenResponse>> {
     match auth::authorize(&request.user, &request.password) {
         Err(_e) => Err(Error::unauthorized()),
         Ok(token) => {
-            let response = TokenResponse::from_token(token)
+            let response = token.into_response()
                 .map_err(|_| Error::new(ErrorKind::InternalServerError, "Unencodable token"))?;
 
             Ok(Json(response))

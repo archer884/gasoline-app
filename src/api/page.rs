@@ -39,7 +39,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Page {
                     .nth(0)
                     .and_then(|q| q.split('=').nth(1))
                     .and_then(|n| n.parse::<i64>().ok())
-                    .map(|n| Page::new(n))
+                    .map(Page::new)
                     .unwrap_or_else(|| Page::new(0)), 
             }
         )

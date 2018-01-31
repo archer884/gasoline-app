@@ -1,5 +1,6 @@
 use chrono::Duration;
 use chrono::prelude::*;
+use model::TokenResponse;
 use rwt::{Rwt, RwtError};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use service;
@@ -27,6 +28,12 @@ impl Token {
 
     pub fn timestamp(&self) -> i64 {
         self.0.payload.exp.timestamp()
+    }
+
+    pub fn into_response(self) -> Result<TokenResponse, RwtError> {
+        let token = self.inner().encode()?;
+        let expiration = self.timestamp();
+        Ok(TokenResponse::new(expiration, token))
     }
 }
 

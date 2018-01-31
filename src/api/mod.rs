@@ -69,6 +69,7 @@ impl error::Error for Error {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Identifier(i64);
 
 impl Deref for Identifier {
